@@ -2,6 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Bold,
+  Italic,
+  Underline,
+  List,
+  ListOrdered,
+} from "lucide-react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import { editorExtensions } from "@/lib/editor-extensions";
 import { saveDocument, renameDocument } from "../actions";
@@ -94,9 +102,10 @@ export default function DocumentEditor({
           <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={goBack}
-              className="shrink-0 text-sm text-zinc-500 hover:underline"
+              className="flex shrink-0 items-center gap-1 text-sm text-zinc-500 hover:underline"
             >
-              ← All documents
+              <ArrowLeft className="h-4 w-4" />
+              All documents
             </button>
             {editingTitle ? (
               <input
@@ -171,14 +180,14 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
   return (
     <div className="mx-auto flex w-full max-w-[850px] flex-wrap gap-1 px-4 pb-2">
-      <Btn active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
-        <span className="font-bold">B</span>
+      <Btn label="Bold" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
+        <Bold className="h-4 w-4" />
       </Btn>
-      <Btn active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>
-        <span className="italic">I</span>
+      <Btn label="Italic" active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>
+        <Italic className="h-4 w-4" />
       </Btn>
-      <Btn active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()}>
-        <span className="underline">U</span>
+      <Btn label="Underline" active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()}>
+        <Underline className="h-4 w-4" />
       </Btn>
       <Divider />
       <Btn active={editor.isActive("heading", { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
@@ -194,11 +203,11 @@ function Toolbar({ editor }: { editor: Editor | null }) {
         H4
       </Btn>
       <Divider />
-      <Btn active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-        • List
+      <Btn label="Bullet list" active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <List className="h-4 w-4" />
       </Btn>
-      <Btn active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
-        1. List
+      <Btn label="Numbered list" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <ListOrdered className="h-4 w-4" />
       </Btn>
     </div>
   );
@@ -207,17 +216,21 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 function Btn({
   active,
   onClick,
+  label,
   children,
 }: {
   active: boolean;
   onClick: () => void;
+  label?: string;
   children: React.ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`min-w-9 rounded px-2 py-1 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+      title={label}
+      aria-label={label}
+      className={`flex h-8 min-w-8 items-center justify-center rounded px-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
         active ? "bg-zinc-200 dark:bg-zinc-700" : ""
       }`}
     >

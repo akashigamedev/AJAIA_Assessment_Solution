@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Upload } from "lucide-react";
 import { marked } from "marked";
 import { generateJSON } from "@tiptap/core";
 import { editorExtensions } from "@/lib/editor-extensions";
@@ -72,8 +73,9 @@ export default function UploadButton() {
       <button
         onClick={() => inputRef.current?.click()}
         disabled={busy}
-        className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:border-zinc-400 disabled:opacity-50 dark:border-zinc-700"
+        className="flex items-center gap-1.5 rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:border-zinc-400 disabled:opacity-50 dark:border-zinc-700"
       >
+        <Upload className="h-4 w-4" />
         {busy ? "Importing…" : "Upload .txt / .md"}
       </button>
       {error && <span className="text-xs text-red-600">{error}</span>}
