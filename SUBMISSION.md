@@ -2,7 +2,7 @@
 
 **Project:** Ajaia Docs — a lightweight collaborative document editor
 **Live URL:** https://ajaia-assessment-solution.vercel.app
-**Walkthrough video:** see `VIDEO.md`
+**Walkthrough video:** see `VIDEO.txt`
 
 ## What's included
 
@@ -11,7 +11,7 @@
 - **ARCHITECTURE.md** — what was prioritized and why, plus key decisions and tradeoffs.
 - **AI_WORKFLOW.md** — which AI tools were used, where they helped, what was changed/rejected, and how correctness was verified.
 - **SUBMISSION.md** — this file.
-- **VIDEO.md** — link to the walkthrough video.
+- **VIDEO.txt** — link to the walkthrough video.
 
 ## What's working
 
