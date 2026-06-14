@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, clearSession } from "@/lib/session";
 import { createDocument, deleteDocument } from "./actions";
 import UploadButton from "./upload-button";
+import Avatar from "../components/avatar";
 
 async function logout() {
   "use server";
@@ -40,6 +41,7 @@ export default async function DocumentsPage() {
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Documents</h1>
         <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+          <Avatar name={user.name} />
           <span>{user.name}</span>
           <form action={logout}>
             <button
@@ -74,17 +76,17 @@ export default async function DocumentsPage() {
             No documents yet. Create your first one.
           </p>
         ) : (
-          <ul className="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="mt-4 space-y-2">
             {owned.map((doc) => (
               <li
                 key={doc.id}
-                className="flex items-center justify-between py-3"
+                className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
               >
                 <Link
                   href={`/documents/${doc.id}`}
-                  className="flex flex-col hover:underline"
+                  className="flex min-w-0 flex-1 flex-col"
                 >
-                  <span className="font-medium">{doc.title}</span>
+                  <span className="truncate font-medium">{doc.title}</span>
                   <span className="text-xs text-zinc-500">
                     Edited {formatDate(doc.updatedAt)}
                   </span>
@@ -111,17 +113,17 @@ export default async function DocumentsPage() {
         {shared.length === 0 ? (
           <p className="mt-4 text-zinc-500">No documents shared with you yet.</p>
         ) : (
-          <ul className="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="mt-4 space-y-2">
             {shared.map((doc) => (
               <li
                 key={doc.id}
-                className="flex items-center justify-between py-3"
+                className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
               >
                 <Link
                   href={`/documents/${doc.id}`}
-                  className="flex flex-col hover:underline"
+                  className="flex min-w-0 flex-1 flex-col"
                 >
-                  <span className="font-medium">{doc.title}</span>
+                  <span className="truncate font-medium">{doc.title}</span>
                   <span className="text-xs text-zinc-500">
                     Owned by {doc.owner.name} · Edited {formatDate(doc.updatedAt)}
                   </span>

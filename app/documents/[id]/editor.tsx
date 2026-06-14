@@ -21,10 +21,12 @@ import {
   MAX_ATTACHMENT_BYTES,
 } from "@/lib/attachments";
 import { saveDocument, renameDocument } from "../actions";
+import Avatar from "../../components/avatar";
 
 type SaveState = "saved" | "saving" | "unsaved";
 
 const AUTOSAVE_DELAY = 1000;
+const INDICATOR_HIDE_DELAY = 2500;
 
 export default function DocumentEditor({
   documentId,
@@ -32,26 +34,42 @@ export default function DocumentEditor({
   initialContent,
   editable,
   isOwner,
+  userName,
 }: {
   documentId: string;
   initialTitle: string;
   initialContent: unknown;
   editable: boolean;
   isOwner: boolean;
+  userName: string;
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [editingTitle, setEditingTitle] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("saved");
+  const [indicatorVisible, setIndicatorVisible] = useState(false);
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Keep the status visible while there's activity; hide it a few seconds after
+  // the last successful save so it doesn't linger once everything is settled.
+  const showIndicator = () => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    setIndicatorVisible(true);
+  };
 
   const save = useCallback(
     async (content: object) => {
+      showIndicator();
       setSaveState("saving");
       // Send as a JSON string: passing the raw object through the server-action
       // boundary serializes it as a client reference, which Prisma rejects.
       await saveDocument(documentId, JSON.stringify(content));
       setSaveState("saved");
+      hideTimer.current = setTimeout(
+        () => setIndicatorVisible(false),
+        INDICATOR_HIDE_DELAY,
+      );
     },
     [documentId],
   );
@@ -62,6 +80,7 @@ export default function DocumentEditor({
     extensions: [...editorExtensions, Attachment],
     content: (initialContent as object) ?? "",
     onUpdate: ({ editor }) => {
+      showIndicator();
       setSaveState("unsaved");
       const json = editor.getJSON();
       if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
@@ -72,14 +91,9 @@ export default function DocumentEditor({
   useEffect(() => {
     return () => {
       if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+      if (hideTimer.current) clearTimeout(hideTimer.current);
     };
   }, []);
-
-  const saveNow = () => {
-    if (!editor) return;
-    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    save(editor.getJSON());
-  };
 
   const goBack = async () => {
     if (editor && editable && saveState !== "saved") {
@@ -140,17 +154,15 @@ export default function DocumentEditor({
             )}
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            <span className="text-sm text-zinc-500">{saveLabel(saveState)}</span>
-            {editable && (
-              <button
-                onClick={saveNow}
-                disabled={saveState !== "unsaved"}
-                className="rounded-md border border-zinc-200 px-3 py-1 text-sm hover:border-zinc-400 disabled:opacity-40 dark:border-zinc-700"
-              >
-                Save
-              </button>
-            )}
+            <span
+              className={`text-sm text-zinc-500 transition-opacity duration-500 ${
+                indicatorVisible ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {saveLabel(saveState)}
+            </span>
             {isOwner && <ShareButton documentId={documentId} />}
+            <Avatar name={userName} />
           </div>
         </div>
         {editable && <Toolbar editor={editor} documentId={documentId} />}
