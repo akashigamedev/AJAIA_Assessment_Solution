@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -22,6 +22,7 @@ export default function DocumentEditor({
   initialContent: unknown;
   editable: boolean;
 }) {
+  const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [editingTitle, setEditingTitle] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("saved");
@@ -66,6 +67,14 @@ export default function DocumentEditor({
     save(editor.getJSON());
   };
 
+  const goBack = async () => {
+    if (editor && editable && saveState !== "saved") {
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+      await save(editor.getJSON());
+    }
+    router.push("/documents");
+  };
+
   const commitTitle = () => {
     setEditingTitle(false);
     if (!editable) return;
@@ -87,12 +96,12 @@ export default function DocumentEditor({
       <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mx-auto flex w-full max-w-[850px] items-center justify-between gap-3 px-4 py-2">
           <div className="flex min-w-0 items-center gap-3">
-            <Link
-              href="/documents"
+            <button
+              onClick={goBack}
               className="shrink-0 text-sm text-zinc-500 hover:underline"
             >
               ← All documents
-            </Link>
+            </button>
             {editingTitle ? (
               <input
                 autoFocus
