@@ -25,6 +25,8 @@ model Document {
   title   String @default("Untitled document")
   // Tiptap document stored as JSON (not HTML).
   content Json?
+  // Unguessable token for the "anyone with the link" share flow.
+  shareToken String? @unique
 
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)

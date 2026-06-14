@@ -14,6 +14,7 @@ import {
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import { editorExtensions } from "@/lib/editor-extensions";
 import { Attachment } from "./attachment-extension";
+import ShareButton from "./share-button";
 import {
   extensionOf,
   isAllowedExtension,
@@ -30,11 +31,13 @@ export default function DocumentEditor({
   initialTitle,
   initialContent,
   editable,
+  isOwner,
 }: {
   documentId: string;
   initialTitle: string;
   initialContent: unknown;
   editable: boolean;
+  isOwner: boolean;
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
@@ -147,6 +150,7 @@ export default function DocumentEditor({
                 Save
               </button>
             )}
+            {isOwner && <ShareButton documentId={documentId} />}
           </div>
         </div>
         {editable && <Toolbar editor={editor} documentId={documentId} />}

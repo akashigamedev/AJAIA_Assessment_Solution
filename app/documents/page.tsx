@@ -25,6 +25,15 @@ export default async function DocumentsPage() {
     orderBy: { updatedAt: "desc" },
   });
 
+  const shared = await prisma.document.findMany({
+    where: { shares: { some: { userId: user.id } } },
+    include: {
+      owner: { select: { name: true } },
+      shares: { where: { userId: user.id }, select: { role: true } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
   return (
     <main className="min-h-screen w-full bg-zinc-100 px-6 py-10 dark:bg-zinc-950">
       <div className="mx-auto w-full max-w-4xl">
@@ -89,6 +98,37 @@ export default async function DocumentsPage() {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+          Shared with me
+        </h2>
+        {shared.length === 0 ? (
+          <p className="mt-4 text-zinc-500">No documents shared with you yet.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800">
+            {shared.map((doc) => (
+              <li
+                key={doc.id}
+                className="flex items-center justify-between py-3"
+              >
+                <Link
+                  href={`/documents/${doc.id}`}
+                  className="flex flex-col hover:underline"
+                >
+                  <span className="font-medium">{doc.title}</span>
+                  <span className="text-xs text-zinc-500">
+                    Owned by {doc.owner.name} · Edited {formatDate(doc.updatedAt)}
+                  </span>
+                </Link>
+                <span className="rounded bg-zinc-200 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                  {doc.shares[0]?.role === "VIEWER" ? "Viewer" : "Editor"}
+                </span>
               </li>
             ))}
           </ul>

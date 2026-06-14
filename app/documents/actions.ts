@@ -13,6 +13,14 @@ async function requireUser() {
   return user;
 }
 
+// Only the owner may manage who a document is shared with.
+async function requireOwner(documentId: string, userId: string) {
+  const access = await getDocumentForUser(documentId, userId);
+  if (!access || access.role !== "OWNER") {
+    throw new Error("Only the owner can manage sharing");
+  }
+}
+
 export async function createDocument() {
   const user = await requireUser();
   const doc = await prisma.document.create({ data: { ownerId: user.id } });
@@ -51,6 +59,47 @@ export async function saveDocument(id: string, contentJson: string) {
 
   const content = JSON.parse(contentJson) as Prisma.InputJsonValue;
   await prisma.document.update({ where: { id }, data: { content } });
+}
+
+// Returns the document's share link token (creating one on first use) plus the
+// list of people who have joined via the link. Owner-only.
+export async function getShareInfo(documentId: string) {
+  const user = await requireUser();
+  await requireOwner(documentId, user.id);
+
+  let doc = await prisma.document.findUniqueOrThrow({
+    where: { id: documentId },
+    select: { shareToken: true },
+  });
+  if (!doc.shareToken) {
+    doc = await prisma.document.update({
+      where: { id: documentId },
+      data: { shareToken: crypto.randomUUID() },
+      select: { shareToken: true },
+    });
+  }
+
+  const shares = await prisma.share.findMany({
+    where: { documentId },
+    include: { user: { select: { id: true, name: true, email: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return {
+    token: doc.shareToken,
+    shares: shares.map((s) => ({
+      userId: s.userId,
+      name: s.user.name,
+      email: s.user.email,
+      role: s.role,
+    })),
+  };
+}
+
+export async function unshareDocument(documentId: string, userId: string) {
+  const user = await requireUser();
+  await requireOwner(documentId, user.id);
+  await prisma.share.deleteMany({ where: { documentId, userId } });
 }
 
 export async function deleteDocument(id: string) {

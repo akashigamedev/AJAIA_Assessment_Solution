@@ -21,6 +21,7 @@ export default async function DocumentPage({
       initialTitle={access.document.title}
       initialContent={access.document.content}
       editable={canEdit(access.role)}
+      isOwner={access.role === "OWNER"}
     />
   );
 }
