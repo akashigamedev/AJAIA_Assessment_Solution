@@ -15,11 +15,15 @@ function escapeHtml(s: string) {
     .replace(/>/g, "&gt;");
 }
 
-// Plain text: each line is its own paragraph; blank lines stay blank.
+// Plain text: a blank line starts a new paragraph; consecutive lines within a
+// block become soft line breaks. This keeps a single blank line as a single
+// paragraph gap instead of an extra empty line.
 function textToHtml(text: string) {
   return text
-    .split(/\r?\n/)
-    .map((line) => `<p>${escapeHtml(line) || "<br>"}</p>`)
+    .trim()
+    .split(/\r?\n\s*\r?\n/)
+    .filter((block) => block.trim().length > 0)
+    .map((block) => `<p>${block.split(/\r?\n/).map(escapeHtml).join("<br>")}</p>`)
     .join("");
 }
 
