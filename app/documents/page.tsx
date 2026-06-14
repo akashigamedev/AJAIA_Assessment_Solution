@@ -24,7 +24,8 @@ export default async function DocumentsPage() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-10">
+    <main className="min-h-screen w-full bg-zinc-100 px-6 py-10 dark:bg-zinc-950">
+      <div className="mx-auto w-full max-w-4xl">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Documents</h1>
         <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
@@ -79,6 +80,7 @@ export default async function DocumentsPage() {
           </ul>
         )}
       </section>
+      </div>
     </main>
   );
 }
