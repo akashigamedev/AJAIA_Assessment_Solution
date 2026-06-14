@@ -9,9 +9,16 @@ import {
   Underline,
   List,
   ListOrdered,
+  Paperclip,
 } from "lucide-react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import { editorExtensions } from "@/lib/editor-extensions";
+import { Attachment } from "./attachment-extension";
+import {
+  extensionOf,
+  isAllowedExtension,
+  MAX_ATTACHMENT_BYTES,
+} from "@/lib/attachments";
 import { saveDocument, renameDocument } from "../actions";
 
 type SaveState = "saved" | "saving" | "unsaved";
@@ -49,7 +56,7 @@ export default function DocumentEditor({
   const editor = useEditor({
     editable,
     immediatelyRender: false,
-    extensions: editorExtensions,
+    extensions: [...editorExtensions, Attachment],
     content: (initialContent as object) ?? "",
     onUpdate: ({ editor }) => {
       setSaveState("unsaved");
@@ -142,7 +149,7 @@ export default function DocumentEditor({
             )}
           </div>
         </div>
-        {editable && <Toolbar editor={editor} />}
+        {editable && <Toolbar editor={editor} documentId={documentId} />}
       </header>
 
       <div className="flex justify-center px-4 py-8">
@@ -164,10 +171,19 @@ function saveLabel(state: SaveState) {
   return "Saved";
 }
 
-function Toolbar({ editor }: { editor: Editor | null }) {
+function Toolbar({
+  editor,
+  documentId,
+}: {
+  editor: Editor | null;
+  documentId: string;
+}) {
   // Re-render on every editor transaction (edits and cursor moves) so the
   // active-state highlights stay in sync with where the cursor is.
   const [, force] = useReducer((n: number) => n + 1, 0);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [attachError, setAttachError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!editor) return;
     editor.on("transaction", force);
@@ -175,6 +191,47 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       editor.off("transaction", force);
     };
   }, [editor]);
+
+  async function onAttach(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !editor) return;
+
+    const ext = extensionOf(file.name);
+    if (!isAllowedExtension(ext)) {
+      setAttachError("Only PDF, PPTX, DOCX, or TXT files are allowed.");
+      return;
+    }
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      setAttachError("File is too large (max 10 MB).");
+      return;
+    }
+    setAttachError(null);
+
+    // Insert a placeholder card that shows its skeleton while uploading.
+    const clientId = crypto.randomUUID();
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "attachment",
+        attrs: { clientId, fileId: null, name: file.name, ext, size: file.size },
+      })
+      .run();
+
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("documentId", documentId);
+      const res = await fetch("/api/attachments", { method: "POST", body: form });
+      if (!res.ok) throw new Error();
+      const meta = (await res.json()) as { id: string };
+      setAttachmentFileId(editor, clientId, meta.id);
+    } catch {
+      removeAttachment(editor, clientId);
+      setAttachError("Upload failed. Please try again.");
+    }
+  }
 
   if (!editor) return null;
 
@@ -209,8 +266,63 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <Btn label="Numbered list" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
         <ListOrdered className="h-4 w-4" />
       </Btn>
+      <Divider />
+      <input
+        ref={fileInput}
+        type="file"
+        accept=".pdf,.pptx,.docx,.txt"
+        onChange={onAttach}
+        className="hidden"
+      />
+      <Btn label="Attach file (PDF, PPTX, DOCX, TXT)" active={false} onClick={() => fileInput.current?.click()}>
+        <Paperclip className="h-4 w-4" />
+      </Btn>
+      {attachError && (
+        <span className="ml-2 self-center text-xs text-red-600">{attachError}</span>
+      )}
     </div>
   );
+}
+
+// Locate the attachment node carrying this clientId so an async upload can
+// update or remove it after it resolves.
+function findAttachmentPos(editor: Editor, clientId: string): number | null {
+  let found: number | null = null;
+  editor.state.doc.descendants((node, pos) => {
+    if (node.type.name === "attachment" && node.attrs.clientId === clientId) {
+      found = pos;
+      return false;
+    }
+  });
+  return found;
+}
+
+function setAttachmentFileId(editor: Editor, clientId: string, fileId: string) {
+  const pos = findAttachmentPos(editor, clientId);
+  if (pos === null) return;
+  const node = editor.state.doc.nodeAt(pos);
+  if (!node) return;
+  editor
+    .chain()
+    .command(({ tr }) => {
+      tr.setNodeMarkup(pos, undefined, { ...node.attrs, fileId, clientId: null });
+      return true;
+    })
+    .run();
+}
+
+function removeAttachment(editor: Editor, clientId: string) {
+  const pos = findAttachmentPos(editor, clientId);
+  if (pos === null) return;
+  const node = editor.state.doc.nodeAt(pos);
+  if (!node) return;
+  editor
+    .chain()
+    .command(({ tr }) => {
+      tr.delete(pos, pos + node.nodeSize);
+      return true;
+    })
+    .run();
 }
 
 function Btn({
