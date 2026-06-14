@@ -2,7 +2,7 @@
 
 **Project:** Ajaia Docs — a lightweight collaborative document editor
 **Live URL:** https://ajaia-assessment-solution.vercel.app
-**Walkthrough video:** see `VIDEO.txt`
+**Walkthrough video:** https://youtu.be/0tQKsFicMhM (also in `VIDEO.txt`)
 
 ## What's included
 

@@ -3,6 +3,7 @@
 A lightweight collaborative document editor — think a small slice of Google Docs. Create and edit rich-text documents, import `.txt`/`.md` files, attach files to a document, and share documents with other users via a link.
 
 **Live demo:** https://ajaia-assessment-solution.vercel.app
+**Walkthrough video:** https://youtu.be/0tQKsFicMhM
 
 ## Features
 
