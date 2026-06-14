@@ -1,3 +1,14 @@
 Walkthrough video (3–5 min):
 
 https://youtu.be/0tQKsFicMhM
+
+---
+
+A quick note: I apologize for the poor audio quality in the video. My
+microphone is currently broken, so I could not record the audio perfectly
+right now. Thank you for your understanding.
+
+For the key decisions and tradeoffs behind this project's architecture, please
+read the included Markdown files — especially ARCHITECTURE.md, SUBMISSION.md,
+and AI_WORKFLOW.md. They explain what I prioritized, what I deprioritized, and
+why.
