@@ -27,7 +27,7 @@ Mapped to the assignment's core requirements:
 | Owned vs. shared distinction | ✅ | Separate "My documents" and "Shared with me" sections. |
 | Persistence | ✅ | Documents, attachments, and shares persist in PostgreSQL; survive refresh; formatting preserved (stored as Tiptap JSON). |
 | Validation & error handling | ✅ | File type/size checks (client + server), access checks on every document/attachment/share action, friendly UI errors. |
-| Automated test | ✅ | At least one meaningful test covering the sharing access-control logic. |
+| Automated test | ✅ | 6 tests in `lib/access.test.ts` covering the document authorization logic (owner/editor/viewer/no-access). Run with `yarn test`. |
 | Deployment | ✅ | Live on Vercel with a hosted PostgreSQL database (Supabase). |
 | Light/Dark/System theme | ✅ | Floating switcher; preference persists with no flash. |
 

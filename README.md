@@ -84,6 +84,14 @@ Requirements: Node 20+ and [Yarn](https://yarnpkg.com) (the project uses Yarn; n
 | `yarn db:seed` | Seed the three demo users |
 | `yarn prisma migrate deploy` | Apply database migrations |
 | `yarn lint` | Run ESLint |
+| `yarn test` | Run the test suite (Vitest) |
+
+## Testing
+
+Run `yarn test`. The suite (`lib/access.test.ts`) covers the document
+authorization logic that the sharing model relies on — owner, editor, viewer,
+and no-access cases. The database is mocked, so the tests run in under a second
+with no network or database needed.
 
 ## Deployment notes
 

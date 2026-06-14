@@ -55,6 +55,14 @@ Four tables (`prisma/schema.prisma`):
 - **Edit:** the client editor debounces and calls the `saveDocument` server action, which re-checks access and writes the JSON.
 - **Share:** owner opens the dialog → `getShareInfo` ensures a token and lists collaborators → the link points at `/share/[token]`, which upserts a `Share` and redirects into the document.
 
+## Testing
+
+The automated test (`lib/access.test.ts`, run with `yarn test`) targets the
+`getDocumentForUser` / `canEdit` authorization logic — the security-critical
+branching that the whole sharing model rests on. The database is mocked so the
+test is fast and deterministic. This was chosen as the most meaningful single
+test: a bug here would mean the wrong people could read or edit a document.
+
 ## Where things live
 
 ```
