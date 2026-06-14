@@ -38,8 +38,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         {children}
-        <SourceLink />
-        <ThemeSwitcher />
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2">
+          <SourceLink />
+          <ThemeSwitcher />
+        </div>
       </body>
     </html>
   );

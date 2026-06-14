@@ -52,7 +52,7 @@ export default function ThemeSwitcher() {
   ];
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-1 rounded-full border border-zinc-200 bg-white p-1 shadow-md dark:border-zinc-700 dark:bg-zinc-900">
+    <div className="flex items-center gap-1 rounded-full border border-zinc-200 bg-white p-1 shadow-md dark:border-zinc-700 dark:bg-zinc-900">
       {options.map(({ value, icon: Icon, label }) => (
         <button
           key={value}

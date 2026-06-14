@@ -8,7 +8,7 @@ export default function SourceLink() {
       target="_blank"
       rel="noopener noreferrer"
       title="View the source code on GitHub"
-      className="fixed bottom-4 left-4 z-50 flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-lg ring-2 ring-blue-500/70 transition hover:ring-blue-500 dark:bg-white dark:text-zinc-900"
+      className="flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-lg ring-2 ring-blue-500/70 transition hover:ring-blue-500 dark:bg-white dark:text-zinc-900"
     >
       <svg
         viewBox="0 0 24 24"
