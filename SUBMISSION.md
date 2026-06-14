@@ -44,8 +44,9 @@ These were deliberate scope cuts to keep depth in the core features within the t
 
 ## What I'd build next with another 2–4 hours
 
-1. **A Notion-style "/" command system** per line for quickly inserting headings, lists, tables, and files using simple slash commands.
-2. **Organizations and members** — create an organization, attach members, and share documents by picking a member directly from the share menu.
-3. **Collections** — organize documents into collections/folders.
-4. **Export** documents to different formats (PDF, DOCX, TXT).
-5. **Public read-only links** — share a URL that anyone can open to view a document without signing in.
+1. **Move attachments to object storage** (e.g. Supabase Storage / S3 / Vercel Blob) instead of storing file bytes in PostgreSQL — better for large files, keeps the database lean, and serves files via CDN.
+2. **A Notion-style "/" command system** per line for quickly inserting headings, lists, tables, and files using simple slash commands.
+3. **Organizations and members** — create an organization, attach members, and share documents by picking a member directly from the share menu.
+4. **Collections** — organize documents into collections/folders.
+5. **Export** documents to different formats (PDF, DOCX, TXT).
+6. **Public read-only links** — share a URL that anyone can open to view a document without signing in.
