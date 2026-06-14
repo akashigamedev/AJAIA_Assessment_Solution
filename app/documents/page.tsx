@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, clearSession } from "@/lib/session";
 import { createDocument, deleteDocument } from "./actions";
+import UploadButton from "./upload-button";
 
 async function logout() {
   "use server";
@@ -43,11 +44,14 @@ export default async function DocumentsPage() {
           <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
             My documents
           </h2>
-          <form action={createDocument}>
-            <button className="rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
-              New document
-            </button>
-          </form>
+          <div className="flex items-start gap-2">
+            <UploadButton />
+            <form action={createDocument}>
+              <button className="rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
+                New document
+              </button>
+            </form>
+          </div>
         </div>
 
         {owned.length === 0 ? (

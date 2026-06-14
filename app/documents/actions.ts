@@ -19,6 +19,19 @@ export async function createDocument() {
   redirect(`/documents/${doc.id}`);
 }
 
+export async function createFromUpload(title: string, contentJson: string) {
+  const user = await requireUser();
+  const content = JSON.parse(contentJson) as Prisma.InputJsonValue;
+  const doc = await prisma.document.create({
+    data: {
+      ownerId: user.id,
+      title: title.trim() || "Untitled document",
+      content,
+    },
+  });
+  redirect(`/documents/${doc.id}`);
+}
+
 export async function renameDocument(id: string, title: string) {
   const user = await requireUser();
   const access = await getDocumentForUser(id, user.id);

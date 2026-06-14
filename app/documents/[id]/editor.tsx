@@ -3,8 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
+import { editorExtensions } from "@/lib/editor-extensions";
 import { saveDocument, renameDocument } from "../actions";
 
 type SaveState = "saved" | "saving" | "unsaved";
@@ -42,10 +41,7 @@ export default function DocumentEditor({
   const editor = useEditor({
     editable,
     immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      Placeholder.configure({ placeholder: "Start writing…" }),
-    ],
+    extensions: editorExtensions,
     content: (initialContent as object) ?? "",
     onUpdate: ({ editor }) => {
       setSaveState("unsaved");
