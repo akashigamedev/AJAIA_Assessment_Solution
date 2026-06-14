@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
 import { marked } from "marked";
 import { generateJSON } from "@tiptap/core";
@@ -26,6 +27,7 @@ function textToHtml(text: string) {
 }
 
 export default function UploadButton() {
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -54,9 +56,10 @@ export default function UploadButton() {
         ext === ".md" ? (marked.parse(text, { async: false }) as string) : textToHtml(text);
       const json = generateJSON(html, editorExtensions);
       const title = name.slice(0, name.length - ext.length);
-      await createFromUpload(title, JSON.stringify(json));
+      const id = await createFromUpload(title, JSON.stringify(json));
+      router.push(`/documents/${id}`);
     } catch {
-      setError("Could not read that file. Please try another.");
+      setError("Could not import that file. Please try another.");
       setBusy(false);
     }
   }

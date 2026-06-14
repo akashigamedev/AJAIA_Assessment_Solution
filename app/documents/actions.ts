@@ -29,7 +29,7 @@ export async function createFromUpload(title: string, contentJson: string) {
       content,
     },
   });
-  redirect(`/documents/${doc.id}`);
+  return doc.id;
 }
 
 export async function renameDocument(id: string, title: string) {
