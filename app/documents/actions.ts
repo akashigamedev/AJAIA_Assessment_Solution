@@ -31,11 +31,12 @@ export async function renameDocument(id: string, title: string) {
   revalidatePath("/documents");
 }
 
-export async function saveDocument(id: string, content: Prisma.InputJsonValue) {
+export async function saveDocument(id: string, contentJson: string) {
   const user = await requireUser();
   const access = await getDocumentForUser(id, user.id);
   if (!access || !canEdit(access.role)) throw new Error("Not allowed");
 
+  const content = JSON.parse(contentJson) as Prisma.InputJsonValue;
   await prisma.document.update({ where: { id }, data: { content } });
 }
 
