@@ -15,16 +15,13 @@ function escapeHtml(s: string) {
     .replace(/>/g, "&gt;");
 }
 
-// Plain text: a blank line starts a new paragraph; consecutive lines within a
-// block become soft line breaks. This keeps a single blank line as a single
-// paragraph gap instead of an extra empty line.
+// Plain text: keep the file's layout exactly. Every newline becomes a hard
+// break inside a single paragraph, so one empty line in the file renders as
+// one empty line here (no stacked paragraph margins doubling the gap).
 function textToHtml(text: string) {
-  return text
-    .trim()
-    .split(/\r?\n\s*\r?\n/)
-    .filter((block) => block.trim().length > 0)
-    .map((block) => `<p>${block.split(/\r?\n/).map(escapeHtml).join("<br>")}</p>`)
-    .join("");
+  const body = text.replace(/\r\n?/g, "\n").replace(/^\n+|\n+$/g, "");
+  const lines = body.split("\n").map(escapeHtml);
+  return `<p>${lines.join("<br>")}</p>`;
 }
 
 export default function UploadButton() {
